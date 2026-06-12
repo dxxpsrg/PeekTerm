@@ -1,0 +1,299 @@
+/* 설정 창 — macOS 시스템 설정 스타일의 카드형 다크 UI. */
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: #15151d;
+  color: #e6e6f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 상단바 (창 드래그 핸들 — 맥 신호등 버튼 아래로 패딩) ── */
+.topbar {
+  -webkit-app-region: drag;
+  padding: 30px 22px 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #6d7bff, #9b7bff);
+  box-shadow: 0 4px 14px rgba(123, 109, 255, 0.4);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.brand-name {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #8b8ba3;
+}
+
+/* ── 본문 ── */
+.content {
+  flex: 1;
+  padding: 4px 18px 0;
+  overflow-y: auto;
+}
+
+.card {
+  background: #1d1d28;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  min-height: 58px;
+}
+
+.row + .row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.row-title {
+  font-weight: 550;
+}
+
+.row-desc {
+  font-size: 11px;
+  color: #8b8ba3;
+}
+
+.row-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── 키캡(kbd) 배지 ── */
+.kbd {
+  min-width: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #14141c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  color: #d7d7e6;
+  letter-spacing: 0.4px;
+}
+
+.kbd-capturing {
+  border-color: #7b8cff;
+  color: #aeb8ff;
+  box-shadow: 0 0 0 3px rgba(123, 140, 255, 0.18);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ── 작은 버튼(변경/취소) ── */
+.btn-soft {
+  padding: 6px 13px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e6e6f0;
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-soft:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ── 슬라이더 ── */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 150px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+/* ── 세그먼트 토글(다크/라이트) ── */
+.segmented {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: #14141c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+.seg {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #9a9ab0;
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.seg:hover {
+  color: #e6e6f0;
+}
+
+.seg-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ── 단축키 캡처 힌트 ── */
+.hint {
+  margin: 12px 6px 0;
+  font-size: 11px;
+  color: #8b8ba3;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.hint-key {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: #14141c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10px;
+}
+
+/* ── 푸터 ── */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px 20px;
+}
+
+.btn-ghost {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #9a9ab0;
+  font-size: 13px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.btn-ghost:hover {
+  color: #e6e6f0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.btn-primary {
+  padding: 9px 20px;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #6d7bff, #9b7bff);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(123, 109, 255, 0.35);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(123, 109, 255, 0.45);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-saved {
+  background: linear-gradient(135deg, #40c057, #2fb344);
+  box-shadow: 0 4px 14px rgba(64, 192, 87, 0.35);
+}
