@@ -1,6 +1,6 @@
 // 앱 엔트리포인트 — 라이프사이클과 초기화를 담당한다.
 import { app } from 'electron';
-import { createTerminalWindow, showTerminalWindow } from './windows/terminal-window';
+import { createTerminalWindow, showTerminalWindow, toggleTerminalWindow } from './windows/terminal-window';
 import { createTray } from './tray';
 import * as pty from './services/pty.service';
 import { loadSettings } from './services/settings.service';
@@ -28,8 +28,8 @@ if (!gotLock) {
     pty.init(); // 단일 zsh 세션 시작(백그라운드 상주).
     registerIpcHandlers();
 
-    // 저장된 단축키로 전역 호출 등록.
-    registerHotkey(settings.hotkey, showTerminalWindow);
+    // 저장된 단축키로 전역 호출 등록 — 보이면 숨기고 숨겨져 있으면 표시하는 토글.
+    registerHotkey(settings.hotkey, toggleTerminalWindow);
   });
 
   // 종료 직전 정리 — 단축키 해제 및 셸 프로세스 종료.

@@ -28,6 +28,15 @@ export function createTerminalWindow(): BrowserWindow {
     },
   });
 
+  // macOS 스페이스 대응: 창을 "모든 스페이스 소속"으로 만들어, show 시 처음 생성된 스페이스로
+  // 화면이 점프하지 않고 현재 활성 스페이스에 뜨게 한다.
+  // 참고: 이 방식은 스페이스 이동 시 창이 잠깐 따라와 깜빡이는 부작용이 있다. 깜빡임을 없애려고
+  //       transient on/off를 쓰면 show가 이전 스페이스로 점프하는 더 큰 문제가 생긴다
+  //       (Electron이 moveToActiveSpace를 노출하지 않는 한계). 점프 없는 동작을 우선해 영구 설정을 유지한다.
+  if (process.platform === 'darwin') {
+    win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  }
+
   // dev 서버 URL이 있으면 그쪽을, 빌드 후엔 로컬 파일을 로드한다.
   if (process.env['ELECTRON_RENDERER_URL']) {
     win.loadURL(process.env['ELECTRON_RENDERER_URL']);
@@ -58,6 +67,17 @@ export function showTerminalWindow(): void {
 
 export function hideTerminalWindow(): void {
   win?.hide();
+}
+
+// 단축키 토글: 창이 보이면 숨기고, 숨겨져 있으면 현재 스페이스에 표시한다.
+// 전역 단축키는 포커스를 이동시키지 않으므로, 호출 시점의 isVisible() 상태가 정확하다.
+export function toggleTerminalWindow(): void {
+  if (!win || win.isDestroyed()) return;
+  if (win.isVisible()) {
+    hideTerminalWindow();
+  } else {
+    showTerminalWindow();
+  }
 }
 
 export function getTerminalWindow(): BrowserWindow | null {
