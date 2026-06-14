@@ -25,6 +25,18 @@
 | 폰트 | JetBrains Mono (번들) |
 | 테스트 | Vitest |
 
+## 제거 방법
+
+peekterm은 로그인 항목, 시스템 확장, 백그라운드 데몬을 설치하지 않아 제거 시 잔여물이 거의 남지 않습니다.
+
+1. peekterm을 종료합니다(트레이 아이콘 → **peekterm 종료**).
+2. 앱을 휴지통으로 옮깁니다.
+3. `settings.json`만 들어 있는 설정 폴더를 삭제합니다:
+
+   ```sh
+   rm -rf ~/Library/Application\ Support/peekterm
+   ```
+
 ## 라이선스
 
 MIT

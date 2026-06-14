@@ -25,6 +25,18 @@ A macOS menu-bar (tray) side-panel terminal. Click the menu-bar icon — or pres
 | Font | JetBrains Mono (bundled) |
 | Tests | Vitest |
 
+## Uninstall
+
+peekterm installs no login items, system extensions, or background daemons — removing the app leaves almost nothing behind.
+
+1. Quit peekterm (tray icon → **peekterm 종료**).
+2. Move the app to the Trash.
+3. Delete the settings folder, which holds only `settings.json`:
+
+   ```sh
+   rm -rf ~/Library/Application\ Support/peekterm
+   ```
+
 ## License
 
 MIT
