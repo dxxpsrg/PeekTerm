@@ -5,7 +5,13 @@ import { AppSettings } from '@shared/types';
 import * as pty from '../services/pty.service';
 import { loadSettings, saveSettings } from '../services/settings.service';
 import { registerHotkey } from '../services/hotkey.service';
-import { containsBell, setAttention } from '../services/attention.service';
+import {
+  containsAttentionSignal,
+  hasSpinnerTitle,
+  markDone,
+  setVisibilityGetter,
+  updateFromOutput,
+} from '../services/attention.service';
 import {
   getTerminalWindow,
   hideTerminalWindow,
@@ -14,12 +20,19 @@ import {
 import { closeSettingsWindow } from '../windows/settings-window';
 
 export function registerIpcHandlers(): void {
+  // 완료 알림이 '창을 보고 있지 않을 때만' 뜨도록, 가시성 판단 함수를 주입한다.
+  setVisibilityGetter(() => getTerminalWindow()?.isVisible() ?? false);
+
   // ── 터미널 입력(renderer → main) ──
+  // 트레이 상태는 여기서 건드리지 않는다. 완료 코랄은 '창이 숨겨졌을 때'만 뜨는데,
+  // 창이 숨겨진 동안 이 채널로 들어오는 데이터는 전부 터미널 자동 응답(커서 위치·DA 등)이라
+  // 사용자 입력이 아니다. 완료 해제는 창을 열 때(showTerminalWindow)만 한다.
   ipcMain.on(IPC.PTY_WRITE, (_e, data: string) => {
-    // 사용자가 입력을 시작하면 완료를 인지한 것으로 보고 알림 점을 해제한다
-    // (창이 열린 채로 완료돼 점이 켜졌던 경우까지 커버).
-    setAttention(false);
-    pty.write(data);
+    // 창을 숨겨도 터미널이 '포커스를 잃었다'고 보고하지 않도록 focus-out(CSI O, \x1b[O)을 제거한다.
+    // Claude Code 등은 포커스를 잃으면 작업 중 제목 스피너 애니메이션을 멈추는데(출력 텍스트는 계속 흐름),
+    // 그러면 창을 숨긴 동안 '작업 중 깜빡임'을 감지할 수 없게 된다. focus-out은 \x1b[O 한 시퀀스뿐이라
+    // 안전하게 제거할 수 있고, 이로써 Claude는 항상 포커스된 것으로 보고 스피너를 계속 갱신한다.
+    pty.write(data.replace(/\x1b\[O/g, ''));
   });
   ipcMain.on(IPC.PTY_RESIZE, (_e, cols: number, rows: number) => pty.resize(cols, rows));
 
@@ -27,8 +40,13 @@ export function registerIpcHandlers(): void {
   // PTY는 창 가시성과 무관하게 살아 있고, 출력은 그때그때 터미널 창으로 전달한다.
   pty.onData((data) => {
     getTerminalWindow()?.webContents.send(IPC.PTY_DATA, data);
-    // CLI 에이전트가 작업 완료/입력 대기 시 보내는 터미널 벨을 감지해 트레이에 점을 표시한다.
-    if (containsBell(data)) setAttention(true);
+
+    // 주 신호: 제목 스피너로 에이전트(Claude Code 등)의 작업 중/완료를 추적한다.
+    // 스피너가 보이면 깜빡임, 일정 시간 안 보이면 코랄 고정.
+    updateFromOutput(data);
+    // 보조 신호: 스피너를 쓰지 않고 완료 시 벨/OSC만 보내는 도구를 위해 그 신호도 완료로 인정한다.
+    // (스피너가 함께 온 청크에서는 작업 중이므로 완료로 보지 않는다.)
+    if (!hasSpinnerTitle(data) && containsAttentionSignal(data)) markDone();
   });
   pty.onExit((code) => {
     getTerminalWindow()?.webContents.send(IPC.PTY_EXIT, code);
